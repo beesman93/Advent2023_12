@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using System.Security;
 
 List<string> lines = new();
@@ -10,9 +11,7 @@ using (StreamReader reader = new(args[0]))
     }
 }
 
-Dictionary<Tuple<int, string>, ulong> alreadyKnown = new();
-
-
+Dictionary<string, ulong> alreadyKnown = new();
 solve(false);
 solve(true);
 void solve(bool part2)
@@ -46,7 +45,7 @@ void solve(bool part2)
 }
 ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
 {
-    Tuple<int, string> remains = new(alreadySolved, a);
+    string remains = a+alreadySolved;
     if (alreadyKnown.ContainsKey(remains))
         return alreadyKnown[remains];
 
@@ -57,15 +56,14 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             if (c == '#')
             {
-                return 0;//don't save this
-
+                //return 0;//don't save this
                 alreadyKnown[remains] = 0;
-                return alreadyKnown[remains];
+                return 0;
             }
         }
-        return 1;//don't save this
+        //return 1;//don't save this
         alreadyKnown[remains] = 1;
-        return alreadyKnown[remains];
+        return 1;
     }
     //solving perms[alreadySolved]
     int need = perms[alreadySolved];
@@ -73,7 +71,7 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     if (need > a.Length)
     {
         alreadyKnown[remains] = 0;
-        return alreadyKnown[remains];
+        return 0;
     }
     int dotsSkip = 0;
     for (; dotsSkip < a.Length; dotsSkip++)
@@ -84,25 +82,24 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             if (--need < 0)
             {
-                return 0;//don't save this
                 alreadyKnown[remains] = 0;
-                return alreadyKnown[remains];
+                return 0;
             }
         }
         else if (a[i] == '.')
         {
             if (need == 0)
             {
-                return tryAllPart2(a.Substring(i), ref perms, alreadySolved + 1);//don't save this
-                string rest = a.Substring(i);//first is solved a single way check how rest goes and return it
-                alreadyKnown[remains] = tryAllPart2(rest, ref perms, alreadySolved + 1);
-                return alreadyKnown[remains];
+                //return tryAllPart2(a.Substring(i), ref perms, alreadySolved + 1);//don't save this
+                //string rest = a.Substring(i);//first is solved a single way check how rest goes and return it
+                ulong r = tryAllPart2(a.Substring(i), ref perms, alreadySolved + 1);
+                alreadyKnown[remains] = r;
+                return r;
             }
             else
             {
-                return 0;//don't save this
                 alreadyKnown[remains] = 0;//first is broken going this way remember and return it's impossible path
-                return alreadyKnown[remains];
+                return 0;
             }
         }
         else //a[i]=='?'
@@ -113,12 +110,11 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
             //try #
             bothWays += tryAllPart2(a.Remove(i, 1).Insert(i, "#"), ref perms, alreadySolved);
             alreadyKnown[remains] = bothWays;
-            return alreadyKnown[remains];
+            return bothWays;
         }
     }
     //last return 0 is for cases where we still need something but we only have dots now
-    //should only happen if we still have need and rest are dots
-    return 0;//don't save this
+    //return 0;//don't save this
     alreadyKnown[remains] = 0;
-    return alreadyKnown[remains];
+    return 0;
 }
