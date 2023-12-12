@@ -13,28 +13,9 @@ using (StreamReader reader = new(args[0]))
 Dictionary<Tuple<int, string>, ulong> alreadyKnown = new();
 
 
-part2();
-part1();
-void part1()
-{
-    ulong total = 0;
-    foreach (string line in lines)
-    {
-        int curr = 0;
-
-        string init = line.Split(' ')[0] + ".";
-        var pp = line.Split(' ')[1].Split(',');
-
-        List<int> perms = new();
-        foreach (var p in pp)
-            perms.Add(int.Parse(p));
-
-        total += tryAll(init, ref perms);
-    }
-    Console.WriteLine($"\npart1 =\t\t{total}");
-}
-
-void part2()
+solve(false);
+solve(true);
+void solve(bool part2)
 {
     Stopwatch totalSw = Stopwatch.StartNew();
     ulong total = 0;
@@ -45,10 +26,12 @@ void part2()
         string init = line.Split(' ')[0];
         var pp = line.Split(' ')[1].Split(',');
 
-        init = init + "?" + init + "?" + init + "?" + init + "?" + init + ".";
+        if(part2)
+            init = init + "?" + init + "?" + init + "?" + init + "?" + init;
+        init += ".";
 
         List<int> perms = new();
-        for(int i=0;i<5;i++)
+        for(int i=0;i<(part2?5:1);i++)
             foreach (var p in pp)
                 perms.Add(int.Parse(p));
 
@@ -59,11 +42,8 @@ void part2()
         //Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
         total += curr;
     }
-    Console.WriteLine($"\npart2 =\t\t{total}\t\tin {totalSw.ElapsedMilliseconds}ms");
+    Console.WriteLine($"part{(part2?2:1)} =\t{total.ToString().PadLeft(20)}\tin {totalSw.ElapsedMilliseconds}ms");
 }
-
-
-
 ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
 {
     Tuple<int, string> remains = new(alreadySolved, a);
@@ -141,53 +121,4 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     return 0;//don't save this
     alreadyKnown[remains] = 0;
     return alreadyKnown[remains];
-}
-ulong tryAll(string a,ref List<int> perms)
-{
-    List<int> permo = new();
-    int cnting = 0;
-    char prev = '_';
-    foreach (char c in a)
-    {
-        if (c == '?')
-        {
-            break;
-        }
-        if (c == '#')
-        {
-            cnting++;
-        }
-        else if (cnting != 0)
-        {
-            permo.Add(cnting);
-            if (permo.Count > perms.Count)
-                return 0;
-            if (permo[permo.Count - 1] != perms[permo.Count - 1])
-                return 0;
-            cnting = 0;
-        }
-        else
-        {
-            cnting = 0;
-        }
-    }
-    //Console.WriteLine(a);
-    for (int i=0;i<a.Length;i++)
-    {
-        if (a[i] == '?')
-        {
-            ulong count = 0;
-            count += tryAll(a.Remove(i, 1).Insert(i, "."),ref perms);
-            count += tryAll(a.Remove(i, 1).Insert(i, "#"), ref perms);
-            return count;
-        }
-    }
-    /*
-    if (cnting != 0)
-        permo.Add(cnting);
-    if (permo[permo.Count - 1] != perms[permo.Count - 1])
-        return 0;*/
-    if (permo.Count != perms.Count)
-        return 0;
-    return 1;
 }
