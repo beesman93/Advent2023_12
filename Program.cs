@@ -56,18 +56,16 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             if (c == '#')
             {
-                //return 0;//don't save this
-                alreadyKnown[remains] = 0;
+                //alreadyKnown[remains] = 0;
                 return 0;
             }
         }
-        //return 1;//don't save this
-        alreadyKnown[remains] = 1;
+        //alreadyKnown[remains] = 1;
         return 1;
     }
     //solving perms[alreadySolved]
     int need = perms[alreadySolved];
-    //int needs = perms.GetRange(alreadySolved, perms.Count - alreadySolved).Sum();
+
     if (need > a.Length)
     {
         alreadyKnown[remains] = 0;
@@ -93,12 +91,12 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
                 //return tryAllPart2(a.Substring(i), ref perms, alreadySolved + 1);//don't save this
                 //string rest = a.Substring(i);//first is solved a single way check how rest goes and return it
                 ulong r = tryAllPart2(a.Substring(i), ref perms, alreadySolved + 1);
-                alreadyKnown[remains] = r;
+                //alreadyKnown[remains] = r;
                 return r;
             }
             else
             {
-                alreadyKnown[remains] = 0;//first is broken going this way remember and return it's impossible path
+                //alreadyKnown[remains] = 0;//first is broken going this way remember and return it's impossible path
                 return 0;
             }
         }
@@ -106,15 +104,17 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             ulong bothWays = 0;
             //try .
-            bothWays += tryAllPart2(a.Remove(i, 1).Insert(i, "."), ref perms, alreadySolved);
+            if (need == 0 || need == perms[alreadySolved])
+                bothWays += tryAllPart2(a.Remove(i, 1).Insert(i, "."), ref perms, alreadySolved);
             //try #
-            bothWays += tryAllPart2(a.Remove(i, 1).Insert(i, "#"), ref perms, alreadySolved);
+            if (need > 0)
+                bothWays += tryAllPart2(a.Remove(i, 1).Insert(i, "#"), ref perms, alreadySolved);
             alreadyKnown[remains] = bothWays;
             return bothWays;
         }
     }
     //last return 0 is for cases where we still need something but we only have dots now
     //return 0;//don't save this
-    alreadyKnown[remains] = 0;
+    //alreadyKnown[remains] = 0;
     return 0;
 }
