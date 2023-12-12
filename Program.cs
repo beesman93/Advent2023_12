@@ -57,7 +57,11 @@ void part2()
         Stopwatch sw = Stopwatch.StartNew();
         ulong curr = tryAllPart2(init,ref perms,0);
         totalMs += sw.ElapsedMilliseconds;
-        //Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
+        Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
+        if(alreadyKnown.Count>50000)
+        {
+            Console.WriteLine(alreadyKnown.Count);
+        }
         total += curr;
     }
     Console.WriteLine($"\npart2 =\t\t{total}\t\tin {totalMs}ms");
@@ -78,15 +82,19 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             if (c == '#')
             {
+                return 0;//don't save this
+
                 alreadyKnown[remains] = 0;
                 return alreadyKnown[remains];
             }
         }
+        return 1;//don't save this
         alreadyKnown[remains] = 1;
         return alreadyKnown[remains];
     }
     //solving perms[alreadySolved]
     int need = perms[alreadySolved];
+    //int needs = perms.GetRange(alreadySolved, perms.Count - alreadySolved).Sum();
     if (need > a.Length)
     {
         alreadyKnown[remains] = 0;
@@ -101,6 +109,7 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             if (--need < 0)
             {
+                return 0;//don't save this
                 alreadyKnown[remains] = 0;
                 return alreadyKnown[remains];
             }
@@ -115,6 +124,7 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
             }
             else
             {
+                return 0;//don't save this result
                 alreadyKnown[remains] = 0;//first is broken going this way remember and return it's impossible path
                 return alreadyKnown[remains];
             }
@@ -132,6 +142,7 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     }
     //last return 0 is for cases where we still need something but we only have dots now
     //should only happen if we still have need and rest are dots
+    return 0;//don't save this
     alreadyKnown[remains] = 0;
     return alreadyKnown[remains];
 }
