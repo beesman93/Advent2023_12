@@ -36,9 +36,9 @@ void part1()
 
 void part2()
 {
+    Stopwatch totalSw = Stopwatch.StartNew();
     ulong total = 0;
     int ll = 0;
-    long totalMs = 0;
     foreach (string line in lines)
     {
 
@@ -54,17 +54,12 @@ void part2()
 
 
         alreadyKnown.Clear();//cache invalidate for next part dummy!
-        Stopwatch sw = Stopwatch.StartNew();
+        //Stopwatch sw = Stopwatch.StartNew();
         ulong curr = tryAllPart2(init,ref perms,0);
-        totalMs += sw.ElapsedMilliseconds;
-        Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
-        if(alreadyKnown.Count>50000)
-        {
-            Console.WriteLine(alreadyKnown.Count);
-        }
+        //Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
         total += curr;
     }
-    Console.WriteLine($"\npart2 =\t\t{total}\t\tin {totalMs}ms");
+    Console.WriteLine($"\npart2 =\t\t{total}\t\tin {totalSw.ElapsedMilliseconds}ms");
 }
 
 
@@ -118,13 +113,14 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
         {
             if (need == 0)
             {
+                return tryAllPart2(a.Substring(i), ref perms, alreadySolved + 1);//don't save this
                 string rest = a.Substring(i);//first is solved a single way check how rest goes and return it
                 alreadyKnown[remains] = tryAllPart2(rest, ref perms, alreadySolved + 1);
                 return alreadyKnown[remains];
             }
             else
             {
-                return 0;//don't save this result
+                return 0;//don't save this
                 alreadyKnown[remains] = 0;//first is broken going this way remember and return it's impossible path
                 return alreadyKnown[remains];
             }
