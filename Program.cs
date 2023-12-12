@@ -57,7 +57,7 @@ void part2()
         Stopwatch sw = Stopwatch.StartNew();
         ulong curr = tryAllPart2(init,ref perms,0);
         totalMs += sw.ElapsedMilliseconds;
-        Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
+        //Console.WriteLine($"line {++ll} =\t\t{curr}\t\tin {sw.ElapsedMilliseconds}ms");
         total += curr;
     }
     Console.WriteLine($"\npart2 =\t\t{total}\t\tin {totalMs}ms");
@@ -74,12 +74,6 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     //when we solved just check rest is dots or ? we can dot
     if (alreadySolved == perms.Count)
     {
-        //len 0 covered after foreach that wont return
-        /*if (a.Length == 0)
-        {
-            alreadyKnown[remains] = 1;
-            return 1;
-        }*/
         foreach (char c in a)
         {
             if (c == '#')
@@ -93,6 +87,11 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     }
     //solving perms[alreadySolved]
     int need = perms[alreadySolved];
+    if (need > a.Length)
+    {
+        alreadyKnown[remains] = 0;
+        return alreadyKnown[remains];
+    }
     int dotsSkip = 0;
     for (; dotsSkip < a.Length; dotsSkip++)
         if (a[dotsSkip] != '.') break;
@@ -100,7 +99,11 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     {
         if (a[i] == '#')
         {
-            need--;
+            if (--need < 0)
+            {
+                alreadyKnown[remains] = 0;
+                return alreadyKnown[remains];
+            }
         }
         else if (a[i] == '.')
         {
@@ -129,17 +132,8 @@ ulong tryAllPart2(string a, ref List<int> perms, int alreadySolved)
     }
     //last return 0 is for cases where we still need something but we only have dots now
     //should only happen if we still have need and rest are dots
-    /* -- No exception thrown, enable again if you change things and results are bad
-    if (need == 0)
-    {
-        throw new Exception("shouldn't happen");
-    }
-    foreach (char c in a)
-    {
-        if (c != '.')
-            throw new Exception("this shouldn't happen either");
-    }*/
-    return 0;
+    alreadyKnown[remains] = 0;
+    return alreadyKnown[remains];
 }
 ulong tryAll(string a,ref List<int> perms)
 {
